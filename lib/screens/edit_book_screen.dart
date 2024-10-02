@@ -4,7 +4,7 @@ class EditBookScreen extends StatefulWidget {
   final String currentTitle;
   final Function(String) onEditBook;
 
-  EditBookScreen({required this.currentTitle, required this.onEditBook});
+  const EditBookScreen({super.key, required this.currentTitle, required this.onEditBook});
 
   @override
   _EditBookScreenState createState() => _EditBookScreenState();
@@ -29,12 +29,12 @@ class _EditBookScreenState extends State<EditBookScreen> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Erro'),
-          content: Text('O título do livro não pode estar vazio.'),
+          title: const Text('Erro'),
+          content: const Text('O título do livro não pode estar vazio.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         ),
@@ -45,20 +45,20 @@ class _EditBookScreenState extends State<EditBookScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Editar Livro')),
+      appBar: AppBar(title: const Text('Editar Livro')),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
               controller: _bookController,
-              decoration: InputDecoration(labelText: 'Título do Livro'),
+              decoration: const InputDecoration(labelText: 'Título do Livro'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _submit,
-              child: Text('Salvar'),
+              child: const Text('Salvar'),
             ),
           ],
         ),

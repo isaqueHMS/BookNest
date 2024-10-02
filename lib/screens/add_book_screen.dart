@@ -1,52 +1,74 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class AddBookScreen extends StatelessWidget {
-  final Function(String) onAddBook;
+class AddBookScreen extends StatefulWidget {
+  const AddBookScreen({super.key});
 
-  AddBookScreen({required this.onAddBook});
+  @override
+  _AddBookScreenState createState() => _AddBookScreenState();
+}
 
-  final TextEditingController _bookController = TextEditingController();
+class _AddBookScreenState extends State<AddBookScreen> {
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _authorController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
-  void _submit(BuildContext context) {
-    final bookTitle = _bookController.text;
-    if (bookTitle.isNotEmpty) {
-      onAddBook(bookTitle);
-      Navigator.pop(context);
-    } else {
-      // Exibe um erro se o título estiver vazio
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Erro'),
-          content: Text('O título do livro não pode estar vazio.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        ),
+  void _addBook(BuildContext context) async {
+    final String title = _titleController.text.trim();
+    final String author = _authorController.text.trim();
+    final String description = _descriptionController.text.trim();
+
+    // Validação dos campos
+    if (title.isEmpty || author.isEmpty || description.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, preencha todos os campos!')),
       );
+      return;
     }
+
+    // Armazena o livro no shared_preferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? books = prefs.getStringList('books') ?? [];
+    books.add('$title|$author|$description'); // Formato: título|autor|descrição
+    await prefs.setStringList('books', books);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Livro adicionado com sucesso!')),
+    );
+
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Adicionar Livro')),
+      appBar: AppBar(
+        title: const Text('Adicionar Livro'),
+      ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
-              controller: _bookController,
-              decoration: InputDecoration(labelText: 'Título do Livro'),
+              controller: _titleController,
+              decoration: const InputDecoration(labelText: 'Título do Livro'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _authorController,
+              decoration: const InputDecoration(labelText: 'Autor do Livro'),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(labelText: 'Descrição do Livro'),
+              maxLines: 5,
+            ),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () => _submit(context),
-              child: Text('Salvar'),
+              onPressed: () => _addBook(context),
+              child: const Text('Adicionar Livro'),
             ),
           ],
         ),
